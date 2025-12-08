@@ -9,11 +9,15 @@ namespace WesternStore2._0
 
         static async Task Main(string[] args)
         {
-            //var connectionString = "";
-            //var databasename = "WesternStoreDB";
+
+            var connectionString = "mongodb://localhost:27017";
+            var databaseName = "WesternStoreLocalDb";
+
+            var crud = new MongoCRUD(connectionString, databaseName);
+
 
             var mainMenu = new MainMenu(crud);
-            mainMenu.ShowMainMenu();
+            await mainMenu.ShowMainMenu();
 
 
         }

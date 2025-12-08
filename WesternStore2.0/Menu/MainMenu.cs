@@ -14,11 +14,12 @@ namespace WesternStore2._0.Menu
         }
 
 
-        public void ShowMainMenu()
+        public async Task ShowMainMenu()
         {
 
             while (true)
             {
+                Console.Clear();
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("======================================");
                 Console.WriteLine("      W E S T E R N   S T O R E   ");
@@ -26,7 +27,7 @@ namespace WesternStore2._0.Menu
                 Console.ResetColor();
                 Console.WriteLine("[1] Login");
                 Console.WriteLine("[2] Register New Customer ");
-                Console.WriteLine("[3] Exit shop");
+                Console.WriteLine("[0] Exit shop");
                 Console.WriteLine("-------------------------------------");
                 Console.Write("\nEnter choice: ");
                 var choice = Console.ReadLine();
@@ -34,12 +35,12 @@ namespace WesternStore2._0.Menu
                 switch (choice)
                 {
                     case "1":
-                        HandleLogin();
+                        await HandleLogin();
                         break;
                     case "2":
-
+                        await AuthService.RegisterCustomer(Crud);
                         break;
-                    case "3":
+                    case "0":
                         Console.WriteLine("Hope we'll see you back soon! Have a great day! ");
                         return;
                     default:
@@ -51,9 +52,9 @@ namespace WesternStore2._0.Menu
 
         }
 
-        private void HandleLogin()
+        private async Task HandleLogin()
         {
-            var loggedInUser = AuthService.Login(Crud).Result;
+            var loggedInUser = await AuthService.Login(Crud);
 
             if (loggedInUser == null)
             {
@@ -71,6 +72,8 @@ namespace WesternStore2._0.Menu
                 customerMenu.ShowCustomerMenu();
             }
         }
+
+
 
     }
 }

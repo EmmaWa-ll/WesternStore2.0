@@ -69,36 +69,46 @@ namespace WesternStore2._0.Data
         }
 
         //update
-        public async Task<bool> Update<T>(string collectionName, string id, T entity)
+        public async Task<T?> Update<T>(string collectionName, string id, T entity)
         {
             try
             {
                 var collection = db.GetCollection<T>(collectionName);
                 var filter = Builders<T>.Filter.Eq("Id", id);
                 var result = await collection.ReplaceOneAsync(filter, entity);
-                return result.ModifiedCount > 0;
+                if (result.MatchedCount == 0)
+                {
+                    return default;
+                }
+                return entity;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating: {ex.Message}");
-                return false;
+                return default;
             }
         }
 
         //Delete
-        public async Task<bool> Delete<T>(string collectionName, string id)
+        public async Task<string> Delete<T>(string collectionName, string id)
         {
             try
             {
                 var collection = db.GetCollection<T>(collectionName);
+
                 var filter = Builders<T>.Filter.Eq("Id", id);
                 var result = await collection.DeleteOneAsync(filter);
-                return result.DeletedCount > 0;
+
+                if (result.DeletedCount == 0)
+                {
+                    return "Nothing was deleted. Item was not found.";
+                }
+                return "Item was deleted sucessfully...";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting: {ex.Message}");
-                return false;
+                return $"Error deleting: {ex.Message}";
+
             }
         }
 

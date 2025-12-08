@@ -7,7 +7,8 @@ namespace WesternStore2._0.Service
     public class AuthService
     {
 
-        private const string UserCollection = "User";
+        private const string UserCollection = "Users";
+
 
 
         public static async Task<User?> Login(MongoCRUD crud)
@@ -23,8 +24,7 @@ namespace WesternStore2._0.Service
                 if (string.IsNullOrWhiteSpace(inputName))
                 {
                     Console.WriteLine("Username cannot be empty.");
-                    Console.Write("Press any key to try again...");
-                    Console.ReadKey();
+                    Input.Pause();
                     continue;
                 }
 
@@ -36,12 +36,12 @@ namespace WesternStore2._0.Service
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error reading users from database: {ex.Message}");
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey();
+                    Input.Pause();
                     return null;
                 }
 
                 var user = users.FirstOrDefault(u => u.UserName.Equals(inputName, StringComparison.OrdinalIgnoreCase));
+
 
                 if (user == null)
                 {
@@ -51,7 +51,7 @@ namespace WesternStore2._0.Service
 
                     if (answer == "yes")
                     {
-                        //await RegisterCustomerAsync(crud);
+                        await RegisterCustomer(crud);
                     }
                     else
                     {
@@ -71,8 +71,9 @@ namespace WesternStore2._0.Service
                     if (string.IsNullOrWhiteSpace(inputPassword) || user.PassWord != inputPassword)
                     {
                         attempts++;
-                        Console.WriteLine($"Wrong password. Attempt left: {MaxAttempts - attempts}");
-                        Console.ReadKey();
+                        Console.Write($"Wrong password. Attempt left: {MaxAttempts - attempts} \n");
+                        Input.Pause();
+
 
                         if (attempts >= MaxAttempts)
                         {
@@ -87,15 +88,87 @@ namespace WesternStore2._0.Service
                         continue;
                     }
 
-                    Console.WriteLine($"\nLogin succesfuiull! Welcome {user.UserName}");
-                    Console.ReadKey();
+                    if (user.IsAdmin)
+                    {
+                        Console.WriteLine($"\nSheriff {user.UserName} is back in town!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\nSaddle up, {user.UserName}! You’re logged in!");
+
+                    }
+                    Input.Pause();
                     return user;
 
 
                 }
             }
-
-
         }
+
+        public static async Task<User?> RegisterCustomer(MongoCRUD crud)
+        {
+            while (true)
+            {
+
+                Console.Clear();
+                Console.WriteLine("=== REGISTER CUSTOMER ===\n");
+
+                Console.Write("Username: ");
+                string username = Console.ReadLine().Trim().ToLower();
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("\nUsername can not be empty.");
+                    Input.Pause();
+                    continue;
+                }
+
+                //om redan finns
+                var allUsers = await crud.ReadAll<User>(UserCollection);
+                if (allUsers.Any(u => u.UserName == username))
+                {
+                    Console.WriteLine("The username is already taken.");
+                    Input.Pause();
+                    continue;
+                }
+
+                string password;
+                while (true)
+                {
+
+
+                    Console.Write("Password: ");
+                    password = Input.ReadPassword();
+
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        Console.WriteLine("Password can not me empty.\n");
+                        Input.Pause();
+                        Console.Clear();
+                        Console.WriteLine("=== REGISTER CUSTOMER === \n");
+                        Console.WriteLine($"Username: {username}");
+                        continue;
+                    }
+                    break;
+
+                }
+                var newUser = new User
+                {
+                    UserName = username,
+                    PassWord = password,
+                    IsAdmin = false
+                };
+                await crud.Create("Users", newUser);
+                Console.WriteLine("\nRegistration sucesssfull!");
+                Input.Pause();
+                return newUser;
+            }
+        }
+
+
+
+
+
+
     }
 }

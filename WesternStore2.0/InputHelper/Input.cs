@@ -6,27 +6,19 @@
         public static string ReadPassword()
         {
             string password = "";
-            ConsoleKey key;
+            ConsoleKeyInfo keyInfo;
 
             while (true)
             {
-                var keyInfo = Console.ReadKey(intercept: true);
-                key = keyInfo.Key;
+                keyInfo = Console.ReadKey(intercept: true);
 
-                if (key == ConsoleKey.Enter)
+                if (keyInfo.Key == ConsoleKey.Enter)
                 {
-                    if (string.IsNullOrWhiteSpace(password))
-                    {
-                        Console.WriteLine("\nPassword cannot be empty. Try again!");
-                        password = "";
-                        continue;
-                    }
-
                     Console.WriteLine();
                     return password;
                 }
 
-                if (key == ConsoleKey.Backspace && password.Length > 0)
+                if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
                     password = password.Remove(password.Length - 1);
                     Console.Write("\b \b");
@@ -38,6 +30,12 @@
                 }
             }
 
+        }
+
+        public static void Pause()
+        {
+            Console.Write("Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }
