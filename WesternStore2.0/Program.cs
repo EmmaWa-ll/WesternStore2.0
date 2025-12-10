@@ -1,25 +1,36 @@
-﻿using WesternStore2._0.Data;
+﻿using Microsoft.Extensions.Configuration;
+using WesternStore2._0.Data;
 using WesternStore2._0.Menu;
 
 namespace WesternStore2._0
 {
     internal class Program
     {
-        private static readonly MongoCRUD crud;
 
         static async Task Main(string[] args)
         {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .Build();
 
-            var connectionString = "mongodb://localhost:27017";
-            var databaseName = "WesternStoreLocalDb";
+            var connectionString = config["Mongo:ConnectionString"];
+            var databaseName = config["Mongo:DatabaseName"] ?? "WesternStoreDb";
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new Exception("MongoDB connection string is missing.");
+            }
+
 
             var crud = new MongoCRUD(connectionString, databaseName);
 
 
+            //await ProductSeeder.SeedProducts(crud);//<- Kallar på min produkter, en gåång, 
+
             var mainMenu = new MainMenu(crud);
             await mainMenu.ShowMainMenu();
-
-
         }
     }
 }

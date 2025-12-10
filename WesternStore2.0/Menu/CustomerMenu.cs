@@ -1,4 +1,5 @@
-﻿using WesternStore2._0.Data;
+﻿using System.Data;
+using WesternStore2._0.Data;
 using WesternStore2._0.InputHelper;
 using WesternStore2._0.Models;
 
@@ -45,7 +46,7 @@ namespace WesternStore2._0.Menu
                         break;
 
                     case "3":
-                        /*CheckOut().Wait();*/
+                        CkeckOut().Wait();
                         break;
 
                     case "0":
@@ -198,7 +199,42 @@ namespace WesternStore2._0.Menu
 
 
         //3. check out 
+        private async Task CkeckOut()
+        {
+            Console.Clear();
+            Console.WriteLine("=== CHECK OUT ===\n");
 
+            if (!cart.Any())
+            {
+                Console.WriteLine("Cart is empty.");
+                Input.Pause();
+                return;
+            }
+
+            decimal total = 0;
+            foreach (var item in cart)
+            {
+                decimal rowTotal = item.Price * item.Quantity;
+                total += rowTotal;
+                Console.WriteLine($"{item.Name} | {item.Quantity} x {item.Price}kr = {rowTotal}kr");
+            }
+            Console.WriteLine("--------------------------------------------");
+            Console.WriteLine($"Total: {total}kr \n");
+
+            Console.Write("Confirm purchase (yes/no) : ");
+            string answer = Console.ReadLine().Trim().ToLower();
+
+            if (answer == "yes")
+            {
+                cart.Clear();
+                Console.WriteLine("\nPurchase comple! Thank you partner.");
+            }
+            else
+            {
+                Console.WriteLine("\nPurchase cancelled.");
+            }
+            Input.Pause();
+        }
 
 
 
