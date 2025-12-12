@@ -9,17 +9,11 @@ namespace WesternStore2._0.Data
 
         public MongoCRUD(string connectionstring, string databaseName)
         {
-            try
-            {
-                var client = new MongoClient(connectionstring);
-                db = client.GetDatabase(databaseName);
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
+            var client = new MongoClient(connectionstring);
+            db = client.GetDatabase(databaseName);
+
+
         }
 
         //Crete

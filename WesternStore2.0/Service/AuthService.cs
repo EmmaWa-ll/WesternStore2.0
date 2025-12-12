@@ -9,8 +9,6 @@ namespace WesternStore2._0.Service
 
         private const string UserCollection = "Users";
 
-
-
         public static async Task<User?> Login(MongoCRUD crud)
         {
             while (true)
@@ -68,7 +66,7 @@ namespace WesternStore2._0.Service
                     Console.Write("Password: ");
                     var inputPassword = Input.ReadPassword();
 
-                    if (string.IsNullOrWhiteSpace(inputPassword) || user.PassWord != inputPassword)
+                    if (string.IsNullOrWhiteSpace(inputPassword) || !PasswordHelper.Verify(inputPassword, user.PassWord))
                     {
                         attempts++;
                         Console.Write($"Wrong password. Attempt left: {MaxAttempts - attempts} \n");
@@ -99,11 +97,10 @@ namespace WesternStore2._0.Service
                     }
                     Input.Pause();
                     return user;
-
-
                 }
             }
         }
+
 
         public static async Task<User?> RegisterCustomer(MongoCRUD crud)
         {
@@ -135,8 +132,6 @@ namespace WesternStore2._0.Service
                 string password;
                 while (true)
                 {
-
-
                     Console.Write("Password: ");
                     password = Input.ReadPassword();
 
@@ -150,12 +145,11 @@ namespace WesternStore2._0.Service
                         continue;
                     }
                     break;
-
                 }
                 var newUser = new User
                 {
                     UserName = username,
-                    PassWord = password,
+                    PassWord = PasswordHelper.Hash(password),
                     IsAdmin = false
                 };
                 await crud.Create("Users", newUser);
@@ -164,6 +158,8 @@ namespace WesternStore2._0.Service
                 return newUser;
             }
         }
+
+
 
 
 

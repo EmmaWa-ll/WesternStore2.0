@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using WesternStore2._0.Data;
 using WesternStore2._0.Menu;
+using WesternStore2._0.Service;
 
 namespace WesternStore2._0
 {
@@ -23,11 +24,10 @@ namespace WesternStore2._0
                 throw new Exception("MongoDB connection string is missing.");
             }
 
-
             var crud = new MongoCRUD(connectionString, databaseName);
 
-
-            //await ProductSeeder.SeedProducts(crud);//<- Kallar på min produkter, en gåång, 
+            await UserSeeder.SeedAdmin(crud);
+            await ProductSeeder.SeedProducts(crud);
 
             var mainMenu = new MainMenu(crud);
             await mainMenu.ShowMainMenu();
